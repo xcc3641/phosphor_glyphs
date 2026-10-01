@@ -1,0 +1,43 @@
+name: phosphor_icons_flutter
+description: Phosphor Icons for Flutter as plain const IconData, generated from the official Phosphor fonts and kept in sync with upstream releases.
+version: 2.1.2
+repository: https://github.com/xcc3641/phosphor_icons_flutter
+issue_tracker: https://github.com/xcc3641/phosphor_icons_flutter/issues
+topics:
+  - icons
+  - phosphor
+  - icon-font
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=3.27.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  args: ^2.6.0
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+  path: ^1.9.0
+  yaml: ^3.1.2
+
+flutter:
+  fonts:
+    - family: Phosphor-Thin
+      fonts:
+        - asset: fonts/Phosphor-Thin.ttf
+    - family: Phosphor-Light
+      fonts:
+        - asset: fonts/Phosphor-Light.ttf
+    - family: Phosphor-Regular
+      fonts:
+        - asset: fonts/Phosphor-Regular.ttf
+    - family: Phosphor-Bold
+      fonts:
+        - asset: fonts/Phosphor-Bold.ttf
+    - family: Phosphor-Fill
+      fonts:
+        - asset: fonts/Phosphor-Fill.ttf
