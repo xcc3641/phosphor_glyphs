@@ -1,4 +1,4 @@
-# phosphor_icons_flutter
+# phosphor_glyphs
 
 [Phosphor Icons](https://phosphoricons.com) for Flutter, generated straight from the
 official `@phosphor-icons/web` fonts and versioned with upstream.
@@ -12,7 +12,7 @@ official `@phosphor-icons/web` fonts and versioned with upstream.
 ## Usage
 
 ```dart
-import 'package:phosphor_icons_flutter/phosphor_icons_flutter.dart';
+import 'package:phosphor_glyphs/phosphor_glyphs.dart';
 
 Icon(PhosphorIconsBold.dotsThreeOutline)
 Icon(PhosphorIconsRegular.downloadSimple, size: 20, color: Colors.grey)

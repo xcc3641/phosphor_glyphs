@@ -20,9 +20,9 @@
    dart pub publish --dry-run   # 确认 0 warning
    dart pub publish
    ```
-2. 打开 <https://pub.dev/packages/phosphor_icons_flutter/admin> → **Automated publishing**
+2. 打开 <https://pub.dev/packages/phosphor_glyphs/admin> → **Automated publishing**
    → 勾选 **Enable publishing from GitHub Actions**:
-   - Repository:`xcc3641/phosphor_icons_flutter`
+   - Repository:`xcc3641/phosphor_glyphs`
    - Tag pattern:`v{{version}}`
    - 其余(environment 等)留空。
 3. 首发版本的 tag 可以补打留档,但推上去会触发 `publish.yml` 并因「版本已存在」失败,

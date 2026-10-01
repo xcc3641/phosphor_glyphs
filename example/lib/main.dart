@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_icons_flutter/phosphor_icons_flutter.dart';
+import 'package:phosphor_glyphs/phosphor_glyphs.dart';
 
 void main() => runApp(const GalleryApp());
 

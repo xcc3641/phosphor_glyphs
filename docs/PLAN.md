@@ -1,4 +1,4 @@
-# phosphor_icons_flutter · 计划与追踪
+# phosphor_glyphs · 计划与追踪
 
 > 追踪在本仓库 GitHub issues(epic #1)。本文是「为什么、做成什么样、怎么维护」的真源,
 > 进度不写这里。
@@ -12,7 +12,7 @@
 
 ## 做成什么样
 
-- 包名 `phosphor_icons_flutter`,MIT,repo `xcc3641/phosphor_icons_flutter`。
+- 包名 `phosphor_glyphs`,MIT,repo `xcc3641/phosphor_glyphs`。
 - 数据源:npm `@phosphor-icons/web` tarball(`src/<weight>/Phosphor.ttf` + `selection.json`,
   2.1 起 codepoint 稳定)。**不**手改任何生成物。
 - 版本号 = Phosphor 版本;我们自己的修补用 build 号:`2.1.2`、`2.1.2+1`、`2.1.2+2`…
@@ -23,7 +23,7 @@
   里那颗 `@pragma('vm:entry-point')` 锚点常量 —— 没有它,一个图标都没用的粗细会整份
   (~500 KB)打进包。引用 `values` 会保留整个粗细;debug 构建不裁。
 - 不继承 `IconData`:常量直接是 `IconData(code, fontFamily: 'Phosphor-Bold',
-  fontPackage: 'phosphor_icons_flutter')`。
+  fontPackage: 'phosphor_glyphs')`。
 - `PhosphorIcons.bold.acorn` 这种按粗细动态取的聚合入口可以有,但必须也是 `IconData`。
 - duotone 单独 widget(两层 glyph 叠色),**不在首发范围**。
 - 生成器:`dart run tool/generate.dart [--version 2.1.2]`,幂等,输出:
@@ -41,7 +41,7 @@
 - `.github/workflows/ci.yml`:push/PR 跑 analyze + test + publish dry-run。
 - `.github/workflows/publish.yml`:打 `v*` tag 触发 pub.dev 自动发布(GitHub Actions
   publisher,OIDC)。**首发必须人工 `dart pub publish`**,之后在 pub.dev 后台把
-  `xcc3641/phosphor_icons_flutter` 配成 automated publisher,这一步只能广志做。
+  `xcc3641/phosphor_glyphs` 配成 automated publisher,这一步只能广志做。
 - 我们自己的修补:改代码 → `+N` → tag → 自动发。上游新版 → 合 sync PR → tag → 自动发。
 
 ## 消费方

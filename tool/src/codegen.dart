@@ -1,7 +1,7 @@
 import 'selection.dart';
 import 'weights.dart';
 
-const packageName = 'phosphor_icons_flutter';
+const packageName = 'phosphor_glyphs';
 
 String _header(String version) => '''
 // GENERATED CODE - DO NOT MODIFY BY HAND.

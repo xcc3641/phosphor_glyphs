@@ -5,7 +5,7 @@
 import 'package:flutter/widgets.dart';
 
 const String _family = 'Phosphor-Thin';
-const String _package = 'phosphor_icons_flutter';
+const String _package = 'phosphor_glyphs';
 
 // Keeps this font visible to the icon tree shaker even when the app uses no
 // icon of this weight, so the font is cut to one glyph instead of shipping whole.

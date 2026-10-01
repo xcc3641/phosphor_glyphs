@@ -1,4 +1,4 @@
-name: phosphor_icons_flutter_example
+name: phosphor_glyphs_example
 description: Browse and search every bold Phosphor icon.
 publish_to: none
 
@@ -8,7 +8,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  phosphor_icons_flutter:
+  phosphor_glyphs:
     path: ../
 
 dev_dependencies:

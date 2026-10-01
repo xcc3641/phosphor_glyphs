@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:phosphor_icons_flutter/phosphor_icons_flutter.dart';
+import 'package:phosphor_glyphs/phosphor_glyphs.dart';
 import 'package:yaml/yaml.dart';
 
 final _pubspec = loadYaml(File('pubspec.yaml').readAsStringSync()) as YamlMap;

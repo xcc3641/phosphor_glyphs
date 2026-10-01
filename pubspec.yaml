@@ -1,8 +1,8 @@
-name: phosphor_icons_flutter
-description: Phosphor Icons for Flutter as plain const IconData, generated from the official Phosphor fonts and kept in sync with upstream releases.
+name: phosphor_glyphs
+description: Phosphor Icons for Flutter as plain const IconData, regenerated from the official fonts and kept in sync with upstream releases.
 version: 2.1.2
-repository: https://github.com/xcc3641/phosphor_icons_flutter
-issue_tracker: https://github.com/xcc3641/phosphor_icons_flutter/issues
+repository: https://github.com/xcc3641/phosphor_glyphs
+issue_tracker: https://github.com/xcc3641/phosphor_glyphs/issues
 topics:
   - icons
   - phosphor

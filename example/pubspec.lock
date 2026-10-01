@@ -54,7 +54,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.0"
-  phosphor_icons_flutter:
+  phosphor_glyphs:
     dependency: "direct main"
     description:
       path: ".."
