@@ -17,15 +17,18 @@
   2.1 起 codepoint 稳定)。**不**手改任何生成物。
 - 版本号 = Phosphor 版本;我们自己的修补用 build 号:`2.1.2`、`2.1.2+1`、`2.1.2+2`…
 - 五个单色粗细各一个字体、各一个类:`PhosphorIconsThin / Light / Regular / Bold / Fill`,
-  常量名 lowerCamel(`dotsThreeOutline`),数字开头加前缀(`number0`→按上游 ligature 名
-  处理)。只 import 某个粗细时只打包那个字体。
+  常量名 lowerCamel(`dotsThreeOutline`),数字开头加前缀 `n`,Dart 保留字加后缀 `Icon`。
+- 包体(实测 Flutter 3.47 `flutter build apk --release`):五个字体都在 pubspec 里声明,
+  **release 构建按用到的 const glyph 裁字体**,用不到的粗细裁到约 1 KB。前提是每个粗细文件
+  里那颗 `@pragma('vm:entry-point')` 锚点常量 —— 没有它,一个图标都没用的粗细会整份
+  (~500 KB)打进包。引用 `values` 会保留整个粗细;debug 构建不裁。
 - 不继承 `IconData`:常量直接是 `IconData(code, fontFamily: 'Phosphor-Bold',
   fontPackage: 'phosphor_icons_flutter')`。
 - `PhosphorIcons.bold.acorn` 这种按粗细动态取的聚合入口可以有,但必须也是 `IconData`。
 - duotone 单独 widget(两层 glyph 叠色),**不在首发范围**。
 - 生成器:`dart run tool/generate.dart [--version 2.1.2]`,幂等,输出:
   `fonts/Phosphor-<Weight>.ttf`、`lib/src/phosphor_icons_<weight>.dart`、
-  `lib/src/phosphor_icons.dart`、改 `pubspec.yaml` 的 `version:`、
+  `lib/src/phosphor_icons.dart`、`fonts/LICENSE`、改 `pubspec.yaml` 的 `version:`、
   往 `CHANGELOG.md` 顶部插一段(新增/删除的图标名,按 selection.json 差分)。
 - 测试只测纯逻辑:名字转换、codepoint 去重、每个粗细常量数一致、字体文件存在且
   `fontFamily` 与 pubspec 一致。不写 widget 测试。

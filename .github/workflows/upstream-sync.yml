@@ -1,0 +1,138 @@
+name: Upstream sync
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Phosphor version to sync (empty = npm latest of @phosphor-icons/web)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare upstream with pubspec
+        id: ver
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          latest="${INPUT_VERSION}"
+          if [ -z "$latest" ]; then
+            latest="$(curl -fsSL https://registry.npmjs.org/@phosphor-icons/web/latest | jq -r .version)"
+          fi
+          if ! printf '%s' "$latest" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Unexpected upstream version: '${latest}'"
+            exit 1
+          fi
+          current="$(sed -nE 's/^version:[[:space:]]*([^[:space:]#]+).*/\1/p' pubspec.yaml | head -n1)"
+          current="${current%%+*}"
+          if [ -z "$current" ]; then
+            echo "::error::No version: found in pubspec.yaml"
+            exit 1
+          fi
+          newest="$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -n1)"
+          if [ "$latest" = "$current" ] || [ "$newest" != "$latest" ]; then
+            echo "Upstream ${latest} is not newer than ${current}; nothing to do."
+            echo "update=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Upstream ${latest} > ${current}; syncing."
+            echo "update=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "version=${latest}" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@v2
+        if: steps.ver.outputs.update == 'true'
+        with:
+          channel: stable
+          cache: true
+
+      - name: Regenerate
+        if: steps.ver.outputs.update == 'true'
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          flutter pub get
+          dart run tool/generate.dart --version "$VERSION"
+
+      # Commit locally before the checks: `dart pub publish --dry-run` warns
+      # (exit 65) on modified checked-in files. create-pull-request picks up
+      # this local commit and pushes it to the sync branch.
+      - name: Commit regenerated files
+        if: steps.ver.outputs.update == 'true'
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m "chore: sync Phosphor ${VERSION}"
+
+      - name: Check formatting
+        if: steps.ver.outputs.update == 'true'
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze
+        if: steps.ver.outputs.update == 'true'
+        run: dart analyze --fatal-infos
+
+      - name: Test
+        if: steps.ver.outputs.update == 'true'
+        run: flutter test
+
+      - name: Publish dry-run
+        if: steps.ver.outputs.update == 'true'
+        run: dart pub publish --dry-run
+
+      - name: Build PR body from CHANGELOG
+        if: steps.ver.outputs.update == 'true'
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          {
+            echo "Automated sync to [\`@phosphor-icons/web@${VERSION}\`](https://www.npmjs.com/package/@phosphor-icons/web/v/${VERSION})."
+            echo
+            awk '/^## /{n++} n==1' CHANGELOG.md
+            echo
+            echo '---'
+            echo "After merging: \`git tag v${VERSION} && git push origin v${VERSION}\` to publish."
+          } > "${RUNNER_TEMP}/pr-body.md"
+          cat "${RUNNER_TEMP}/pr-body.md"
+
+      - name: Ensure label exists
+        if: steps.ver.outputs.update == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh label create upstream-sync --force --color 5319e7 --description 'Automated Phosphor upstream sync'
+
+      # One branch per version: if a PR for this branch is already open, the
+      # action force-updates that branch/PR instead of opening a second one.
+      # PRs opened with GITHUB_TOKEN do not trigger ci.yml; set the optional
+      # SYNC_PAT secret if CI should run on sync PRs automatically.
+      - name: Open PR
+        if: steps.ver.outputs.update == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.SYNC_PAT || github.token }}
+          branch: sync/phosphor-${{ steps.ver.outputs.version }}
+          base: main
+          title: 'chore: sync Phosphor ${{ steps.ver.outputs.version }}'
+          commit-message: 'chore: sync Phosphor ${{ steps.ver.outputs.version }}'
+          body-path: ${{ runner.temp }}/pr-body.md
+          labels: upstream-sync
+          delete-branch: true

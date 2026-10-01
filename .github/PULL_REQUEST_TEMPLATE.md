@@ -1,0 +1,3 @@
+- [ ] 生成器幂等:`dart run tool/generate.dart` 重跑后 `git status` 干净
+- [ ] `CHANGELOG.md` 已更新(若改了 `pubspec.yaml` 的 `version:`)
+- [ ] `dart pub publish --dry-run` 无 warning

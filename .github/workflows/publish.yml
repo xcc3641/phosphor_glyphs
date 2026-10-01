@@ -1,0 +1,51 @@
+name: Publish to pub.dev
+
+# pub.dev automated publishing (OIDC). Requires the one-time setup in
+# docs/MAINTENANCE.md (first manual publish + Admin -> Automated publishing,
+# tag pattern `v{{version}}`), otherwise pub.dev answers 403.
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tag must match pubspec version
+        run: |
+          version="$(sed -nE 's/^version:[[:space:]]*([^[:space:]#]+).*/\1/p' pubspec.yaml | head -n1)"
+          if [ -z "$version" ]; then
+            echo "::error::No version: found in pubspec.yaml"
+            exit 1
+          fi
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match pubspec version v${version}"
+            exit 1
+          fi
+          echo "Publishing ${version}"
+
+      # setup-dart exchanges the GitHub OIDC token for a pub.dev token.
+      - uses: dart-lang/setup-dart@v1
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Publish
+        run: dart pub publish --force
