@@ -126,7 +126,7 @@ jobs:
       # SYNC_PAT secret if CI should run on sync PRs automatically.
       - name: Open PR
         if: steps.ver.outputs.update == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.SYNC_PAT || github.token }}
           branch: sync/phosphor-${{ steps.ver.outputs.version }}
