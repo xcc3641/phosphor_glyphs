@@ -7,7 +7,8 @@ official `@phosphor-icons/web` fonts and versioned with upstream.
   on Flutter 3.43+ where `IconData` is a `final` class.
 - Five weights, one class each: `PhosphorIconsThin`, `PhosphorIconsLight`,
   `PhosphorIconsRegular`, `PhosphorIconsBold`, `PhosphorIconsFill`.
-- 1512 icons per weight (Phosphor 2.1.2). Duotone is not included yet.
+- Duotone too, as stacked two-layer glyphs: `PhosphorDuotoneIcon(PhosphorIconsDuotone.acorn)`.
+- 1512 icons per weight (Phosphor 2.1.2), six weights including duotone.
 
 ## Usage
 
@@ -37,6 +38,26 @@ Rules applied by the generator:
 - Where upstream lists two names for one glyph, the first is the constant and the
   others are aliases pointing at it.
 
+### Duotone
+
+Duotone icons stack a translucent fill under an outline, so they are not a
+single `IconData`. `PhosphorIconsDuotone` holds `const`
+`PhosphorDuotoneIconData` values; draw them with `PhosphorDuotoneIcon`, which
+behaves like `Icon` (size, colour, semantics all follow `IconTheme`):
+
+```dart
+PhosphorDuotoneIcon(PhosphorIconsDuotone.acorn)
+PhosphorDuotoneIcon(
+  PhosphorIconsDuotone.heart,
+  size: 32,
+  color: Colors.red,
+  secondaryColor: Colors.pink.shade100, // default: colour at 20% opacity
+)
+```
+
+`PhosphorIconsDuotone.wifiNone` and `cellSignalNone` ship as one layer upstream,
+so their `secondary` is null and they render as a plain icon.
+
 Each class also has `values`, a `Map<String, IconData>` of every icon in that weight,
 and `PhosphorIconsStyle` (`thin` ... `fill`) has an `icons` getter returning the same
 map. Use them for pickers and galleries only; see the next section for why.
@@ -54,6 +75,7 @@ not drop the others from the asset bundle. As shipped (before tree shaking):
 | `Phosphor-Regular.ttf` | 477 KB |
 | `Phosphor-Bold.ttf`    | 484 KB |
 | `Phosphor-Fill.ttf`    | 439 KB |
+| `Phosphor-Duotone.ttf` | 568 KB |
 
 What keeps apps small is Flutter's icon font tree shaking, on by default for
 `--release` and `--profile` builds. Every constant is a `const IconData` with a
@@ -67,6 +89,7 @@ Measured with `flutter build apk --release` (Flutter 3.47.5, android-arm64):
 | App                                             | Bold      | Each other weight | APK     |
 | ----------------------------------------------- | --------- | ----------------- | ------- |
 | 3 bold + 1 regular icon                         | 1.6 KB    | ~1 KB             | 14.6 MB |
+| 1 bold + 1 duotone icon                         | 1 KB      | ~1 KB (duotone 1.3 KB) | 15.2 MB |
 | The example gallery (all bold via `values`)     | 422 KB    | ~1 KB             | 16.8 MB |
 | Same 4 icons, before the retained-glyph anchor  | 1.3 KB    | unused: full size | 15.2 MB |
 

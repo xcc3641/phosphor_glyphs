@@ -12,13 +12,31 @@ String _header(String version) => '''
 String _hex(int code) =>
     '0x${code.toRadixString(16).toUpperCase().padLeft(4, '0')}';
 
+String _iconData(int code) =>
+    'IconData(${_hex(code)}, fontFamily: _family, fontPackage: _package)';
+
 /// Source of `lib/src/phosphor_icons_<weight>.dart` (unformatted).
 String renderWeightFile(
     Weight weight, List<IconEntry> entries, String version) {
+  final duo = weight.isDuotone;
+  final type = duo ? 'PhosphorDuotoneIconData' : 'IconData';
+  String value(IconEntry e) {
+    if (!duo) return _iconData(e.codepoint);
+    final second = e.secondaryCodepoint;
+    return 'PhosphorDuotoneIconData(${_iconData(e.codepoint)}'
+        '${second == null ? '' : ', secondary: ${_iconData(second)}'})';
+  }
+
   final out = StringBuffer()
     ..writeln(_header(version))
     ..writeln("import 'package:flutter/widgets.dart';")
-    ..writeln()
+    ..writeln();
+  if (duo) {
+    out
+      ..writeln("import 'phosphor_duotone_icon.dart';")
+      ..writeln();
+  }
+  out
     ..writeln("const String _family = '${weight.fontFamily}';")
     ..writeln("const String _package = '$packageName';")
     ..writeln()
@@ -32,27 +50,36 @@ String renderWeightFile(
         'of shipping whole.')
     ..writeln("@pragma('vm:entry-point')")
     ..writeln('const IconData _treeShakeAnchor = '
-        'IconData(${_hex(entries.first.codepoint)}, fontFamily: _family, fontPackage: _package);')
+        '${_iconData(entries.first.codepoint)};')
     ..writeln()
     ..writeln('/// Phosphor icons in the ${weight.name} weight '
         '(font family `${weight.fontFamily}`).')
-    ..writeln('///')
-    ..writeln(
-        '/// Every member is a `const` [IconData], so release builds only '
-        'keep the glyphs')
-    ..writeln('/// you reference: `Icon(${weight.className}.acorn)`.')
-    ..writeln('abstract final class ${weight.className} {');
+    ..writeln('///');
+  if (duo) {
+    out
+      ..writeln('/// Every member is a `const` [PhosphorDuotoneIconData] (two '
+          'stacked glyphs),')
+      ..writeln('/// drawn with [PhosphorDuotoneIcon]: '
+          '`PhosphorDuotoneIcon(${weight.className}.acorn)`.')
+      ..writeln('/// Release builds only keep the glyphs you reference.');
+  } else {
+    out
+      ..writeln(
+          '/// Every member is a `const` [IconData], so release builds only '
+          'keep the glyphs')
+      ..writeln('/// you reference: `Icon(${weight.className}.acorn)`.');
+  }
+  out.writeln('abstract final class ${weight.className} {');
 
   for (final e in entries) {
     out
       ..writeln('  /// Phosphor `${e.kebab}`, ${weight.name} weight.')
-      ..writeln('  static const IconData ${e.constant} = '
-          'IconData(${_hex(e.codepoint)}, fontFamily: _family, fontPackage: _package);')
+      ..writeln('  static const $type ${e.constant} = ${value(e)};')
       ..writeln();
     for (final alias in e.aliases) {
       out
         ..writeln('  /// Alias of [${e.constant}], ${weight.name} weight.')
-        ..writeln('  static const IconData $alias = ${e.constant};')
+        ..writeln('  static const $type $alias = ${e.constant};')
         ..writeln();
     }
   }
@@ -65,7 +92,7 @@ String renderWeightFile(
         '`${weight.fontFamily}` in release')
     ..writeln('  /// builds; use it for pickers and galleries, not for '
         'looking up a single icon.')
-    ..writeln('  static const Map<String, IconData> values = {');
+    ..writeln('  static const Map<String, $type> values = {');
   for (final e in entries) {
     out.writeln("    '${e.constant}': ${e.constant},");
   }
@@ -81,14 +108,18 @@ String renderStyleFile(String version) {
     ..writeln(_header(version))
     ..writeln("import 'package:flutter/widgets.dart';")
     ..writeln();
-  for (final w in Weight.values) {
+  for (final w in Weight.mono) {
     out.writeln("import 'phosphor_icons_${w.name}.dart';");
   }
   out
     ..writeln()
-    ..writeln('/// The Phosphor weights shipped by this package.')
+    ..writeln('/// The single-colour Phosphor weights shipped by this package.')
+    ..writeln('///')
+    ..writeln('/// Duotone is not a style here: its icons are '
+        '`PhosphorDuotoneIconData`, not')
+    ..writeln('/// [IconData]. See `PhosphorIconsDuotone`.')
     ..writeln('enum PhosphorIconsStyle {');
-  for (final w in Weight.values) {
+  for (final w in Weight.mono) {
     out
       ..writeln('  /// [${w.className}], font family `${w.fontFamily}`.')
       ..writeln('  ${w.name},');
@@ -102,7 +133,7 @@ String renderStyleFile(String version) {
         'see `values` on the')
     ..writeln('  /// weight classes.')
     ..writeln('  Map<String, IconData> get icons => switch (this) {');
-  for (final w in Weight.values) {
+  for (final w in Weight.mono) {
     out.writeln(
         '        PhosphorIconsStyle.${w.name} => ${w.className}.values,');
   }

@@ -25,20 +25,43 @@ class GalleryPage extends StatefulWidget {
 
 class _GalleryPageState extends State<GalleryPage> {
   String _query = '';
+  bool _duotone = false;
 
   @override
   Widget build(BuildContext context) {
     final query = _query.toLowerCase();
-    // PhosphorIconsBold.values references every glyph, so this gallery keeps
-    // the whole bold font. Apps that name icons directly
+    // `values` references every glyph, so this gallery keeps the whole bold
+    // and duotone fonts. Apps that name icons directly
     // (PhosphorIconsBold.acorn) only ship the glyphs they use.
-    final icons = PhosphorIconsBold.values.entries
-        .where((e) => e.key.toLowerCase().contains(query))
-        .toList();
+    final Map<String, Object> all =
+        _duotone ? PhosphorIconsDuotone.values : PhosphorIconsBold.values;
+    final icons =
+        all.entries.where((e) => e.key.toLowerCase().contains(query)).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Phosphor bold · ${icons.length}'),
+        title: Text(
+          'Phosphor ${_duotone ? 'duotone' : 'bold'} · ${icons.length}',
+        ),
+        actions: [
+          SegmentedButton<bool>(
+            segments: const [
+              ButtonSegment(
+                value: false,
+                icon: Icon(PhosphorIconsBold.acorn),
+                label: Text('Bold'),
+              ),
+              ButtonSegment(
+                value: true,
+                icon: PhosphorDuotoneIcon(PhosphorIconsDuotone.acorn),
+                label: Text('Duotone'),
+              ),
+            ],
+            selected: {_duotone},
+            onSelectionChanged: (s) => setState(() => _duotone = s.single),
+          ),
+          const SizedBox(width: 12),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(64),
           child: Padding(
@@ -66,7 +89,12 @@ class _GalleryPageState extends State<GalleryPage> {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 32),
+              switch (icon) {
+                final PhosphorDuotoneIconData d =>
+                  PhosphorDuotoneIcon(d, size: 32),
+                final IconData i => Icon(i, size: 32),
+                _ => const SizedBox.square(dimension: 32),
+              },
               const SizedBox(height: 8),
               Text(
                 name,
