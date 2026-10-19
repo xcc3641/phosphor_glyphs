@@ -30,3 +30,12 @@ migrate_working_dir/
 /build/
 /coverage/
 example/pubspec.lock
+example/ios/Flutter/ephemeral/
+example/ios/Flutter/Generated.xcconfig
+example/ios/Flutter/flutter_export_environment.sh
+example/ios/Podfile
+example/ios/Podfile.lock
+example/ios/Pods/
+example/ios/.symlinks/
+example/ios/Runner/GeneratedPluginRegistrant.h
+example/ios/Runner/GeneratedPluginRegistrant.m

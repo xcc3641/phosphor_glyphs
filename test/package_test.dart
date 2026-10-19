@@ -45,12 +45,50 @@ void main() {
     });
   }
 
-  test('pubspec declares exactly one family per style', () {
-    expect(_fonts, hasLength(PhosphorIconsStyle.values.length));
+  group('duotone', () {
+    final icons = PhosphorIconsDuotone.values.values;
+    final glyphs = [
+      for (final i in icons) ...[i.primary, if (i.secondary case final s?) s],
+    ];
+
+    test('has the same icon names as the single-colour weights', () {
+      expect(
+        PhosphorIconsDuotone.values.keys.toList(),
+        PhosphorIconsStyle.regular.icons.keys.toList(),
+      );
+    });
+
+    test('almost every icon has two layers', () {
+      final single = icons.where((i) => i.secondary == null).length;
+      expect(single, lessThan(10));
+    });
+
+    test('codepoints are unique across both layers', () {
+      final codes = glyphs.map((g) => g.codePoint).toList();
+      expect(codes.toSet(), hasLength(codes.length));
+    });
+
+    test('uses one pubspec font family from this package', () {
+      expect(glyphs.map((g) => g.fontFamily).toSet(), {'Phosphor-Duotone'});
+      expect(_fonts.keys, contains('Phosphor-Duotone'));
+      expect(glyphs.map((g) => g.fontPackage).toSet(), {_pubspec['name']});
+    });
+
+    test('aliases point at the same icon', () {
+      expect(
+        PhosphorIconsDuotone.caduceus,
+        same(PhosphorIconsDuotone.asclepius),
+      );
+    });
+  });
+
+  test('pubspec declares exactly one family per weight', () {
     final used = {
       for (final s in PhosphorIconsStyle.values)
         s.icons.values.first.fontFamily,
+      PhosphorIconsDuotone.acorn.primary.fontFamily,
     };
+    expect(_fonts, hasLength(used.length));
     expect(used, _fonts.keys.toSet());
   });
 

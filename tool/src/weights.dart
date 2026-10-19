@@ -1,13 +1,20 @@
-/// The single-colour Phosphor weights this package ships.
+/// The Phosphor weights this package ships, one font each.
 ///
-/// Duotone is deliberately absent: it needs two stacked glyphs, not one
-/// `IconData`.
+/// The first five are single-colour: one glyph per icon, one `IconData`.
+/// [duotone] stacks two glyphs per icon and is generated as
+/// `PhosphorDuotoneIconData` instead.
 enum Weight {
   thin,
   light,
   regular,
   bold,
-  fill;
+  fill,
+  duotone;
+
+  /// The single-colour weights, the ones `PhosphorIconsStyle` covers.
+  static const mono = [thin, light, regular, bold, fill];
+
+  bool get isDuotone => this == duotone;
 
   /// `Thin`, `Regular`, ...
   String get title => name[0].toUpperCase() + name.substring(1);

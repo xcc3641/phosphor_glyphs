@@ -25,7 +25,10 @@
 - 不继承 `IconData`:常量直接是 `IconData(code, fontFamily: 'Phosphor-Bold',
   fontPackage: 'phosphor_glyphs')`。
 - `PhosphorIcons.bold.acorn` 这种按粗细动态取的聚合入口可以有,但必须也是 `IconData`。
-- duotone 单独 widget(两层 glyph 叠色),**不在首发范围**。
+- duotone 不是单色,每个图标两枚 codepoint(`codes: [填充, 描边]`),所以单独走
+  `PhosphorDuotoneIconData` + `PhosphorDuotoneIcon`,不进 `PhosphorIconsStyle`。
+  `wifi-none` / `cell-signal-none` 上游只有一层,`secondary` 为 null。字体同样参与
+  tree shaking(实测引用一个图标 568 KB → 1.3 KB)。
 - 生成器:`dart run tool/generate.dart [--version 2.1.2]`,幂等,输出:
   `fonts/Phosphor-<Weight>.ttf`、`lib/src/phosphor_icons_<weight>.dart`、
   `lib/src/phosphor_icons.dart`、`fonts/LICENSE`、改 `pubspec.yaml` 的 `version:`、

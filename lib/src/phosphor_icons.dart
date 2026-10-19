@@ -10,7 +10,10 @@ import 'phosphor_icons_regular.dart';
 import 'phosphor_icons_bold.dart';
 import 'phosphor_icons_fill.dart';
 
-/// The Phosphor weights shipped by this package.
+/// The single-colour Phosphor weights shipped by this package.
+///
+/// Duotone is not a style here: its icons are `PhosphorDuotoneIconData`, not
+/// [IconData]. See `PhosphorIconsDuotone`.
 enum PhosphorIconsStyle {
   /// [PhosphorIconsThin], font family `Phosphor-Thin`.
   thin,

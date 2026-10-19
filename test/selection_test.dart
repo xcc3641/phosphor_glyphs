@@ -31,6 +31,65 @@ void main() {
     expect(entry.aliases, ['caduceus']);
   });
 
+  test('duotone codes become secondary (fill) and primary (outline)', () {
+    final entries = parseSelection({
+      'icons': [
+        {
+          'properties': {
+            'name': 'acorn-duotone',
+            'code': 10,
+            'codes': [10, 11],
+          },
+        },
+        {
+          'properties': {'name': 'wifi-none-duotone', 'code': 20},
+        },
+      ],
+    }, '-duotone');
+    expect(entries.map((e) => e.codepoint), [11, 20]);
+    expect(entries.map((e) => e.secondaryCodepoint), [10, null]);
+  });
+
+  test('duotone codes must start with code and have at most two', () {
+    for (final codes in [
+      [11, 10],
+      [10, 11, 12],
+      <int>[],
+    ]) {
+      expect(
+        () => parseSelection({
+          'icons': [
+            {
+              'properties': {'name': 'a', 'code': 10, 'codes': codes},
+            },
+          ],
+        }, ''),
+        throwsFormatException,
+        reason: '$codes',
+      );
+    }
+  });
+
+  test('a codepoint shared between layers of two icons throws', () {
+    expect(
+      () => parseSelection({
+        'icons': [
+          {
+            'properties': {
+              'name': 'a',
+              'code': 1,
+              'codes': [1, 2],
+            },
+          },
+          {
+            'properties': {'name': 'b', 'code': 2},
+          },
+        ],
+      }, ''),
+      throwsFormatException,
+    );
+  });
+
   test('duplicate codepoints throw', () {
     expect(
       () => parseSelection(_selection([('a', 1), ('b', 1)]), ''),
